@@ -4,11 +4,17 @@ var crypto = require('crypto'),
 
 module.exports = function (app) {
     app.get('/', function (req, res) {
-        res.render('index', {
-            title: '主页',
-            user: req.session.user,
-            success: req.flash('success').toString(),
-            error: req.flash('error').toString()
+        Post.get(null, function (err, posts) {
+            if (err) {
+                posts = [];
+            }
+            res.render('index', {
+                title: '主页',
+                user: req.session.user,
+                posts: posts,
+                success: req.flash('success').toString(),
+                error: req.flash('error').toString()
+            });
         });
     });
     //注册
@@ -96,10 +102,25 @@ module.exports = function (app) {
     //发表文章
     app.get('/post', checkLogin);
     app.get('/post', function (req, res) {
-        res.render('post', {title: '发表'});
+        res.render('post', {
+            title: '发表',
+            user: req.session.user,
+            success: req.flash('success').toString(),
+            error: req.flash('error').toString()
+        });
     });
     app.post('/post', checkLogin);
     app.post('/post', function (req, res) {
+        var currentUser = req.session.user,
+            post = new Post(currentUser.name, req.body.title, req.body.post);
+        post.save(function (err) {
+            if (err) {
+                req.flash('error', err);
+                return res.redirect('/');
+            }
+            req.flash('success', '发布成功!');
+            res.redirect('/');//发表成功跳转到主页
+        });
     });
     //登出
     app.get('/logout', checkLogin);
@@ -111,17 +132,17 @@ module.exports = function (app) {
 };
 
 function checkLogin(req, res, next) {
-  if (!req.session.user) {
-    req.flash('error', '未登录!');
-    res.redirect('/login');
-  }
-  next();
+    if (!req.session.user) {
+        req.flash('error', '未登录!');
+        res.redirect('/login');
+    }
+    next();
 }
 
 function checkNotLogin(req, res, next) {
-  if (req.session.user) {
-    req.flash('error', '已登录!');
-    res.redirect('back');//返回之前的页面
-  }
-  next();
+    if (req.session.user) {
+        req.flash('error', '已登录!');
+        res.redirect('back');//返回之前的页面
+    }
+    next();
 }

@@ -2,6 +2,31 @@ var crypto = require('crypto'),
     User = require('../models/user.js'),
     Post = require('../models/post.js');
 
+var multer = require('multer');
+//原版本使用方法
+//app.use(multer({
+//  dest: './public/images',
+//  rename: function (fieldname, filename) {
+//    return filename;
+//  }
+//}));
+//新的使用方法
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/images')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+var upload = multer({storage: storage});
+// var upload = multer({
+//     dest: './public/images',
+//     rename: function (fieldname, filename) {
+//         return fieldname + '_' + filename;
+//     }
+// });
+
 module.exports = function (app) {
     app.get('/', function (req, res) {
         Post.get(null, function (err, posts) {
@@ -128,6 +153,21 @@ module.exports = function (app) {
         req.session.user = null;
         req.flash('success', '登出成功!');
         res.redirect('/');//登出成功后跳转到主页
+    });
+    //上传
+    app.get('/upload', checkLogin);
+    app.get('/upload', function (req, res) {
+        res.render('upload', {
+            title: '文件上传',
+            user: req.session.user,
+            success: req.flash('success').toString(),
+            error: req.flash('error').toString()
+        });
+    });
+    app.post('/upload', checkLogin);
+    app.post('/upload', upload.single('field1'), function (req, res) {
+        req.flash('success', '文件上传成功!文件路径为: ' + req.file.path);
+        res.redirect('/upload');
     });
 };
 

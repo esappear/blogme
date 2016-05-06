@@ -20,12 +20,6 @@ var storage = multer.diskStorage({
     }
 });
 var upload = multer({storage: storage});
-// var upload = multer({
-//     dest: './public/images',
-//     rename: function (fieldname, filename) {
-//         return fieldname + '_' + filename;
-//     }
-// });
 
 module.exports = function (app) {
     app.get('/', function (req, res) {
@@ -166,7 +160,7 @@ module.exports = function (app) {
     });
     app.post('/upload', checkLogin);
     app.post('/upload', upload.single('field1'), function (req, res) {
-        req.flash('success', '文件上传成功!文件路径为: ' + req.file.path);
+        req.flash('success', '文件上传成功!文件路径为: ' + req.file.path.split('public')[1]);
         res.redirect('/upload');
     });
 };

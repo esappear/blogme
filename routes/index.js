@@ -171,6 +171,23 @@ module.exports = function (app) {
         res.redirect('/upload');
     });
 
+    //获取存档内容
+    app.get('/archive', function (req, res) {
+        Post.getArchive(function (err, posts) {
+            if (err) {
+                req.flash('error', err);
+                return res.redirect('/');
+            }
+            res.render('archive', {
+                title: '存档',
+                posts: posts,
+                user: req.session.user,
+                success: req.flash('success').toString(),
+                error: req.flash('error').toString()
+            });
+        });
+    });
+
     //按用户名获取文章
     app.get('/u/:name', function (req, res) {
         var page = parseInt(req.query.p) || 1;

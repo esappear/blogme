@@ -1,5 +1,4 @@
 <br />
-<% if (post.comments) { %>
 <% post.comments.forEach(function (comment, index) { %>
   <p><a href="<%= comment.website %>"><%= comment.name %></a>
   <span class="info"> 回复于 <%= comment.time %></span></p>
@@ -19,4 +18,3 @@
   <textarea name="content" rows="5" cols="80"></textarea><br />
   <input type="submit" value="留言" />
 </form>
-<% } %>

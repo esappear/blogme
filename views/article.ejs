@@ -10,5 +10,7 @@
   日期：<%= post.time.minute %>
 </p>
 <p><%- post.post %></p>
+<% if (post.comments) { %>
 <%- include comment %>
+<% } %>
 <%- include footer %>

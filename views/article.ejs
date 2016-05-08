@@ -18,6 +18,9 @@
   <% } %>
 </p>
 <p><%- post.post %></p>
+ <% if(post.pv && post.comments) { %>
+  <p class="info">阅读：<%= post.pv %> | 评论：<%= post.comments.length %></p>
+  <% } %>
 <% if (post.comments) { %>
 <%- include comment %>
 <% } %>
